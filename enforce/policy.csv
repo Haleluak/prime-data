@@ -1,0 +1,2 @@
+p, user_a, /app/hello, GET
+p, user_b, /app/request, POST
