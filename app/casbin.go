@@ -2,8 +2,9 @@ package app
 
 import (
 	"database/sql"
-	"github.com/casbin/casbin/v2"
 	sqladapter "github.com/Blank-Xu/sql-adapter"
+	"github.com/casbin/casbin/v2"
+	"log"
 )
 
 func InitCasbin() *casbin.Enforcer {
@@ -20,6 +21,10 @@ func InitCasbin() *casbin.Enforcer {
 	e, err := casbin.NewEnforcer("enforce/model.conf", a)
 	if err != nil {
 		panic(err)
+	}
+
+	if err = e.LoadPolicy(); err != nil {
+		log.Println("LoadPolicy failed, err: ", err)
 	}
 
 	return e

@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"prime-data/models"
 	"prime-data/pkg/errors"
 	gohttp "prime-data/pkg/http"
 	"prime-data/schema"
@@ -26,7 +27,20 @@ func (a *Auth) Login(c *gin.Context) gohttp.Response{
 	}
 
 	ctx := c.Request.Context()
-	tokenInfo, err := a.service.Login(ctx)
+	user, err := models.QueryUser(ctx, models.Client,item.Username, item.Password)
+	if err != nil{
+		return gohttp.Response{
+			Error: errors.InvalidParams.New(),
+		}
+	}
+
+	if user.ID == 0 {
+		return gohttp.Response{
+			Error: errors.ErrorAuth.New(),
+		}
+	}
+
+	tokenInfo, err := a.service.Login(ctx, user)
 	if err != nil {
 		fmt.Print(err)
 		return gohttp.Response{

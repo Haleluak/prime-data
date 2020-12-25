@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"prime-data/models"
 	"syscall"
 	"time"
 
@@ -16,10 +17,10 @@ import (
 func main() {
 	container := app.BuildContainer()
 
-	client := app.InitOrmDB()
-	defer client.Close()
+	models.InitOrmDB()
+	defer models.Client.Close()
 
-	app.Migrate(client)
+	app.Migrate(models.Client)
 	authEnforcer := app.InitCasbin()
 
 	engine := router.InitGinEngine(container, authEnforcer)
@@ -42,7 +43,7 @@ func main() {
 	<-quit
 	logger.Info("Shutdown Server ...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
 		logger.Fatal("Server Shutdown: ", err)

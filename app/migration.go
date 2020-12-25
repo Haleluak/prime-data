@@ -1,9 +1,7 @@
 package app
 
 import (
-	"fmt"
 	"context"
-	"github.com/google/logger"
 	"prime-data/ent"
 )
 
@@ -14,29 +12,20 @@ func Migrate(client *ent.Client) {
 }
 
 func createUser(ctx context.Context, client *ent.Client) ( error) {
-	_, err := client.User.
-		Create().
-		SetUsername("duc").
-		SetPassword("12345").
-		Save(ctx)
-	if err != nil {
-		logger.Info(err)
-		return fmt.Errorf("failed creating user: %v", err)
-	}
-	return nil
+	bulk := make([]*ent.UserCreate, 2)
+	bulk[0] = client.User.Create().SetUsername("duc").SetPassword("12345")
+	bulk[1] = client.User.Create().SetUsername("rayn").SetPassword("12345")
+
+	_, err := client.User.CreateBulk(bulk...).Save(ctx)
+	return err
 }
 
 func createPolicy(ctx context.Context, client *ent.Client) ( error) {
-	_, err := client.CasbinRule.
-		Create().
-		SetPType("p").
-		SetV0("user_a").
-		SetV1("/app/hello").
-		SetV2("GET").
-		Save(ctx)
-	if err != nil {
-		return  fmt.Errorf("failed creating user: %v", err)
-	}
+	bulk := make([]*ent.CasbinRuleCreate, 3)
+	bulk[0] = client.CasbinRule.Create().SetPType("p").SetV0("1").SetV1("/app/hello").SetV2("GET").SetV3("").SetV4("").SetV5("")
+	bulk[1] = client.CasbinRule.Create().SetPType("p").SetV0("2").SetV1("/app/hello").SetV2("GET").SetV3("").SetV4("").SetV5("")
+	bulk[2] = client.CasbinRule.Create().SetPType("p").SetV0("2").SetV1("/app/request").SetV2("POST").SetV3("").SetV4("").SetV5("")
 
-	return nil
+	_, err := client.CasbinRule.CreateBulk(bulk...).Save(ctx)
+	return err
 }

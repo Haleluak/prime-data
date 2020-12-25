@@ -1,2 +1,2 @@
-p, user_a, /app/hello, GET
-p, user_b, /app/request, POST
+p, 1, /app/hello, GET
+p, 2, /app/request, POST

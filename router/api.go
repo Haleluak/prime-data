@@ -22,8 +22,8 @@ func RegisterAPI(r *gin.Engine, container *dig.Container, e *casbin.Enforcer) er
 
 		api := r.Group("/app", middleware.UserAuthMiddleware(jwt))
 		{
-			api.GET("/hello", wrapper.Wrap(auth.Hello))
-			api.POST("/request", middleware.CasbinMiddleware(e))
+			api.GET("/hello", middleware.CasbinMiddleware(e), wrapper.Wrap(auth.Hello))
+			api.POST("/request", middleware.CasbinMiddleware(e), wrapper.Wrap(auth.Hello))
 		}
 		return nil
 	})

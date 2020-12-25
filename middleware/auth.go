@@ -32,14 +32,16 @@ func CasbinMiddleware(e *casbin.Enforcer) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		p := c.Request.URL.Path
 		m := c.Request.Method
-		ok, err := enforce.CasbinEnforce(e, "user_a", p, m)
+		userId := app.GetUserID(c)
+
+		ok, err := enforce.CasbinEnforce(e, userId, p, m)
 		if err != nil {
 			wrapper.Translate(c, gohttp.Response{Error: err})
 			c.Abort()
 			return
 		}
 		if !ok {
-			wrapper.Translate(c, gohttp.Response{Error: errors.ErrorExistRole.New()})
+			wrapper.Translate(c, gohttp.Response{Error: errors.ErrMethodNotAllow})
 			c.Abort()
 			return
 		}

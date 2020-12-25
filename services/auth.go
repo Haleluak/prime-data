@@ -2,8 +2,10 @@ package services
 
 import (
 	"context"
+	"prime-data/ent"
 	"prime-data/pkg/jwt"
 	"prime-data/schema"
+	"strconv"
 )
 
 type AuthService struct {
@@ -12,7 +14,7 @@ type AuthService struct {
 
 
 type IAuthService interface {
-	Login(ctx context.Context) (*schema.UserTokenInfo, error)
+	Login(ctx context.Context, item *ent.User) (*schema.UserTokenInfo, error)
 }
 
 func NewAuthService(jwt jwt.IJWTAuth) IAuthService{
@@ -21,8 +23,8 @@ func NewAuthService(jwt jwt.IJWTAuth) IAuthService{
 	}
 }
 
-func (a *AuthService) Login(ctx context.Context) (*schema.UserTokenInfo, error){
-	token, err := a.jwt.GenerateToken("12")
+func (a *AuthService) Login(ctx context.Context, item *ent.User ) (*schema.UserTokenInfo, error){
+	token, err := a.jwt.GenerateToken(strconv.Itoa(item.ID))
 	if err != nil {
 		return  nil, err
 	}

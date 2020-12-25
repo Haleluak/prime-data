@@ -74,7 +74,6 @@ func (a *JWTAuth) parseToken(tokenString string, refresh bool) (*jwt.StandardCla
 		option = a.opts.keyFuncRefresh
 	}
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, option)
-
 	if err != nil {
 		if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
@@ -100,6 +99,7 @@ func (jwtAuth *JWTAuth) ParseUserID(tokenString string, refresh bool) (string, e
 	if err != nil {
 		return "", err
 	}
+
 	return claims.Subject, nil
 }
 
