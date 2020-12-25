@@ -17,7 +17,7 @@ func RegisterAPI(r *gin.Engine, container *dig.Container, e *casbin.Enforcer) er
 		auth *api.Auth,
 	) error {
 		{
-			r.POST("/api/login", wrapper.Wrap(auth.Login))
+			r.POST("/login", wrapper.Wrap(auth.Login))
 		}
 
 		api := r.Group("/app", middleware.UserAuthMiddleware(jwt))

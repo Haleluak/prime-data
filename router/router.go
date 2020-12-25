@@ -8,6 +8,7 @@ import (
 
 func InitGinEngine(container *dig.Container, e *casbin.Enforcer) *gin.Engine {
 	app := gin.New()
+	Docs(app)
 	RegisterAPI(app, container, e)
 	return app
 }
