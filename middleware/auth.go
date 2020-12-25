@@ -1,8 +1,11 @@
 package middleware
 
 import (
+	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
+	"prime-data/enforce"
 	"prime-data/pkg/app"
+	"prime-data/pkg/errors"
 	gohttp "prime-data/pkg/http"
 	"prime-data/pkg/http/wrapper"
 	"prime-data/pkg/jwt"
@@ -25,6 +28,21 @@ func UserAuthMiddleware(a jwt.IJWTAuth) gin.HandlerFunc {
 	}
 }
 
-func Authorize( sub, obj, act string)  gin.HandlerFunc {
-
+func CasbinMiddleware(e *casbin.Enforcer) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		p := c.Request.URL.Path
+		m := c.Request.Method
+		ok, err := enforce.CasbinEnforce(e, "user_a", p, m)
+		if err != nil {
+			wrapper.Translate(c, gohttp.Response{Error: err})
+			c.Abort()
+			return
+		}
+		if !ok {
+			wrapper.Translate(c, gohttp.Response{Error: errors.ErrorExistRole.New()})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
 }

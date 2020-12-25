@@ -1,14 +1,13 @@
 package enforce
 
 import (
-	"github.com/casbin/casbin"
+	"github.com/casbin/casbin/v2"
 )
 
 type Enforcer struct {
 	enforcer *casbin.Enforcer
 }
 
-func (e *Enforcer) Enforce()  {
-	user, path, method := "admin", "/admin/route", "POST"
-	result := e.enforcer.Enforce(user, path, method)
+func CasbinEnforce(e *casbin.Enforcer, sub, obj, act string) (bool, error) {
+	return e.Enforce(sub, obj, act)
 }

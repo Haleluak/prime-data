@@ -2,38 +2,27 @@ package main
 
 import (
 	"context"
-	"github.com/google/logger"
-	"go.uber.org/dig"
 	"net/http"
 	"os"
 	"os/signal"
-	"prime-data/api"
-	"prime-data/app"
-	"prime-data/pkg/jwt"
-	"prime-data/router"
-	"prime-data/services"
 	"syscall"
 	"time"
+
+	"github.com/google/logger"
+	"prime-data/app"
+	"prime-data/router"
 )
 
-func main()  {
-	container := dig.New()
-	authen, err := app.InitAuth()
-	_ = container.Provide(func() jwt.IJWTAuth {
-		return authen
-	})
+func main() {
+	container := app.BuildContainer()
 
-	err = services.Inject(container)
-	if err != nil {
-		logger.Error("Failed to inject services", err)
-	}
+	client := app.InitOrmDB()
+	defer client.Close()
 
-	err = api.Inject(container)
-	if err != nil {
-		logger.Error("Failed to inject APIs", err)
-	}
+	app.Migrate(client)
+	authEnforcer := app.InitCasbin()
 
-	engine := router.InitGinEngine(container)
+	engine := router.InitGinEngine(container, authEnforcer)
 
 	server := &http.Server{
 		Addr:    ":8888",
@@ -65,4 +54,3 @@ func main()  {
 	}
 	logger.Info("Server exiting")
 }
-

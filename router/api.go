@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/google/logger"
 	"go.uber.org/dig"
@@ -10,7 +11,7 @@ import (
 	"prime-data/pkg/jwt"
 )
 
-func RegisterAPI(r *gin.Engine, container *dig.Container) error {
+func RegisterAPI(r *gin.Engine, container *dig.Container, e *casbin.Enforcer) error {
 	err := container.Invoke(func(
 		jwt jwt.IJWTAuth,
 		auth *api.Auth,
@@ -22,7 +23,7 @@ func RegisterAPI(r *gin.Engine, container *dig.Container) error {
 		api := r.Group("/app", middleware.UserAuthMiddleware(jwt))
 		{
 			api.GET("/hello", wrapper.Wrap(auth.Hello))
-			api.GET("/request", )
+			api.POST("/request", middleware.CasbinMiddleware(e))
 		}
 		return nil
 	})
